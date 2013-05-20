@@ -19,6 +19,9 @@ public class MachineControl {
 	//	=>	CONSTANTS
 	//=====================================================================
 	private static final int kCONSTANT_PRESSURE_FLOOR = 100;
+	private static final int kCONSTANT_CURRENT_FLOOR = 50;
+	private static final int kCONSTANT_CURRENT_PRESSURE_CEILING = 50;
+	private static final int kCONSTANT_CURRENT_PRESSURE_FLOOR = 10;
 	
 	
 	
@@ -126,6 +129,35 @@ public class MachineControl {
 				 return false;
 			 }
 			 
+		 }
+		 
+		 this.underlyingHardware.stopHardware();
+		 return true;
+		 
+	 }
+	 
+	 
+	 public boolean constantCurrentMode(int T, int partSize) {
+		 
+		 this.underlyingHardware.startHardware();
+		 
+		 for (int i = 0; i < T; i++) {
+			 
+			 HashMap<String, Integer> inputs = new HashMap<String, Integer>();
+			 inputs.put(Hardware.INPUT_KEY_FOR_ELECTRICAL_CURRENT, kCONSTANT_CURRENT_FLOOR + partSize);
+			 
+			 //		set pressure
+			 if ((kCONSTANT_CURRENT_PRESSURE_CEILING - 2 * i) <= kCONSTANT_CURRENT_PRESSURE_FLOOR) {
+				 inputs.put(Hardware.INPUT_KEY_FOR_AIR_PRESSURE, kCONSTANT_CURRENT_PRESSURE_FLOOR);
+			 }
+			 else inputs.put(Hardware.INPUT_KEY_FOR_AIR_PRESSURE, kCONSTANT_CURRENT_PRESSURE_CEILING - 2 * i);
+			 
+			 inputs.put(Hardware.INPUT_KEY_FOR_SECONDS, 1);
+			 
+			 if (!this.underlyingHardware.performOneSecondOfWork(inputs, i)) {
+				 this.underlyingHardware.stopHardware();
+				 return false;
+			 }
 		 }
 		 
 		 this.underlyingHardware.stopHardware();
