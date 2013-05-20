@@ -117,9 +117,9 @@ public class Hardware {
 		assert (controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE)) != null;
 		assert (controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT)) != null;
 		
-		//		parse the control parameterse
-		this.airPressuePSI = controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE);
-		this.currentAmps = controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT);
+		//		parse the control parameters
+		this.setAirPressure(controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE));
+		this.setCurrent(controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT));
 		
 		
 		//		simulate machine working

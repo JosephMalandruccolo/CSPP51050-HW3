@@ -22,6 +22,7 @@ public class MachineControl {
 	private static final int kCONSTANT_CURRENT_FLOOR = 50;
 	private static final int kCONSTANT_CURRENT_PRESSURE_CEILING = 50;
 	private static final int kCONSTANT_CURRENT_PRESSURE_FLOOR = 10;
+	private static final int kRAMP_PRESSURE_CEILING = 100;
 	
 	
 	
@@ -162,6 +163,37 @@ public class MachineControl {
 		 
 		 this.underlyingHardware.stopHardware();
 		 return true;
+		 
+	 }
+	 
+	 
+	 public boolean rampMode(int T, int partSize) {
+		 
+		 if (partSize <= 50) throw new IllegalArgumentException(new String("Minimum part size is 51"));
+		 
+		 this.underlyingHardware.startHardware();
+		 
+		 for (int i = 0; i < T; i++) {
+			 
+			 HashMap<String, Integer> inputs = new HashMap<String, Integer>();
+			 
+			 int calculatedPSI = i * 10;
+			 if (calculatedPSI >= kRAMP_PRESSURE_CEILING ) inputs.put(Hardware.INPUT_KEY_FOR_AIR_PRESSURE, kRAMP_PRESSURE_CEILING);
+			 else inputs.put(Hardware.INPUT_KEY_FOR_AIR_PRESSURE, calculatedPSI);
+			 
+			 int calculatedAmps = partSize + i * 20;
+			 inputs.put(Hardware.INPUT_KEY_FOR_ELECTRICAL_CURRENT, calculatedAmps);
+			 
+			 if (!this.underlyingHardware.performOneSecondOfWork(inputs, i)) {
+				 this.underlyingHardware.stopHardware();
+				 return false;
+			 }
+				 
+		 }
+		 
+		 this.underlyingHardware.stopHardware();
+		 return true;
+		 
 		 
 	 }
 	

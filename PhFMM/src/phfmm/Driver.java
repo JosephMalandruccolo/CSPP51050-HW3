@@ -15,7 +15,7 @@ public class Driver {
 		
 		System.out.println(mc.constantPressueMode(3, 20));
 		System.out.println(mc.constantCurrentMode(4, 10));
-		
+		System.out.println(mc.rampMode(30, 51));
 	}
 
 }
