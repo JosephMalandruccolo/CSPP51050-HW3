@@ -1,5 +1,7 @@
 package phfmm;
 
+import java.util.HashMap;
+
 /**
  * @author Joseph Malandruccolo
  * Machine control layer performs the following functions
@@ -12,6 +14,12 @@ package phfmm;
  * MachineControl works with a given instance of underlying hardware
  */
 public class MachineControl {
+	
+	//=====================================================================
+	//	=>	CONSTANTS
+	//=====================================================================
+	private static final int kCONSTANT_PRESSURE_FLOOR = 100;
+	
 	
 	
 	//=====================================================================
@@ -96,6 +104,34 @@ public class MachineControl {
 			
 		}
 	}
+	
+	
+	
+	//=====================================================================
+	//	=>	PRIVATE METHODS
+	//=====================================================================
+	 public boolean constantPressueMode(int T, int partSize) {
+		 
+		 this.underlyingHardware.startHardware();
+		 
+		 for (int i = 0; i < T; i++) {
+			 
+			 HashMap<String, Integer> inputs = new HashMap<String, Integer>();
+			 inputs.put(Hardware.INPUT_KEY_FOR_ELECTRICAL_CURRENT, i * 2);
+			 inputs.put(Hardware.INPUT_KEY_FOR_AIR_PRESSURE, partSize + kCONSTANT_PRESSURE_FLOOR);
+			 inputs.put(Hardware.INPUT_KEY_FOR_SECONDS, 1);
+			 
+			 if (!this.underlyingHardware.performOneSecondOfWork(inputs, i)) {
+				 this.underlyingHardware.stopHardware();
+				 return false;
+			 }
+			 
+		 }
+		 
+		 this.underlyingHardware.stopHardware();
+		 return true;
+		 
+	 }
 	
 	
 	

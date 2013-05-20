@@ -68,51 +68,15 @@ public class Hardware {
 			return false;
 		}
 		
-		//	check that the required control parameters are made
-		assert (controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE)) != null;
-		assert (controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT)) != null;
 		assert (controlParameters.get(INPUT_KEY_FOR_SECONDS)) != null;
 		
-		//	read the control parameters
-		this.airPressuePSI = controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE);
-		this.currentAmps = controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT);
 		int secondsToWork = controlParameters.get(INPUT_KEY_FOR_SECONDS);
 		
-		//		prepare to write to the log file
-		File currentLogFile = new File(this.currentLogFileName);
-		FileWriter fw = null;
-		try { fw = new FileWriter(currentLogFile.getAbsolutePath()); } 
-		catch (IOException e1) { System.out.println("Hardware failure: machine failed to find log file"); }
-		BufferedWriter bw = new BufferedWriter(fw);
-		
-		for (int i = 1; i <= secondsToWork; i++) {
+		for (int i = 0; i < secondsToWork; i++) {
 			
-			//	simulate machine working
-			try { Thread.sleep(secondsToWork * SECONDS_PER_MILLISECOND); } 
-			catch (InterruptedException e) {
-				System.out.println("Hardware failure: machine failed to work for the alloted time");
-				return false;
-			} 
+			if(!this.performOneSecondOfWork(controlParameters, i)) return false;
+		}
 			
-			//	write control values to the log file
-			try {
-				
-				bw.write(i+","+this.airPressuePSI+","+this.currentAmps);
-				if (i != secondsToWork) bw.write("\n");
-				
-			} catch (IOException e) {
-				System.out.println("Hardware failure: machine failed to write to log");
-			}
-
-		}
-		
-		
-		try {
-			bw.close();
-		} catch (IOException e) {
-			System.out.println("Hardware failure: machine failed to close log file");
-		}
-		
 		return true;
 		
 	}
@@ -140,6 +104,63 @@ public class Hardware {
 	 */
 	public boolean work() { return this.work(DEFAULT_SECONDS); }
 	
+	
+	/**
+	 * Method to perform one second of work, with given paramters
+	 * @param controlParameters - HashMap of control parameters
+	 * @param currentSecond - the human readable current second to display in a log file
+	 * @return - true if the work succeeded, false otherwise
+	 */
+	public boolean performOneSecondOfWork(HashMap<String, Integer> controlParameters, int currentSecond) {
+		
+		//		check that the required control parameters are made
+		assert (controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE)) != null;
+		assert (controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT)) != null;
+		
+		//		parse the control parameterse
+		this.airPressuePSI = controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE);
+		this.currentAmps = controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT);
+		
+		
+		//		simulate machine working
+		try { Thread.sleep(1 * SECONDS_PER_MILLISECOND); } 
+		catch (InterruptedException e) {
+			System.out.println("Hardware failure: machine failed to work for the alloted time");
+			return false;
+		} 
+		
+		//		prepare to write to the log file
+		boolean success = true;
+		File currentLogFile = new File(this.currentLogFileName);
+		FileWriter fw = null;
+		try { fw = new FileWriter(currentLogFile.getAbsolutePath(), true); } 
+		catch (IOException e1) { 
+			System.out.println("Hardware failure: machine failed to find log file"); 
+			success = false;
+		}
+		BufferedWriter bw = new BufferedWriter(fw);
+		
+		//		write control values to the log file
+		try {
+			
+			if (currentSecond != 0) bw.write("\n");
+			bw.write(currentSecond+","+this.airPressuePSI+","+this.currentAmps);
+			
+					
+		} catch (IOException e) {
+			System.out.println("Hardware failure: machine failed to write to log");
+			success = false;
+		}
+				
+		try {
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("Hardware failure: machine failed to close log file");
+			success = false;
+		}
+		
+		return success;
+	}
 	
 	//=====================================================================
 	//	=>	GETTERS AND SETTERS
@@ -265,4 +286,13 @@ public class Hardware {
 	
 	
 	public String getLogFileName() { return this.currentLogFileName; }
+	
+	
+	
+	
+
+	
+	
+	
+	
 }
