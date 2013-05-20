@@ -207,8 +207,9 @@ public class Hardware {
 	 * booting up the hardware generates a log file
 	 * the log file is stored in the 'dasFiles' directory in the src folder
 	 * the log file name is a concatenation of the number of milliseconds since January 1, 1970 and a pseudo-random number
+	 * @return - true if the hardware started successfully, false otherwise
 	 */
-	public void startHardware() { 
+	public boolean startHardware() { 
 		
 		this.isOnline = true; 
 		
@@ -244,13 +245,21 @@ public class Hardware {
 			
 		} while (createFileAttempts <= 3 && logFileSuccessfullyCreated == false);
 		
+		return logFileSuccessfullyCreated;
+		
 	}
 	
 	
+	/**
+	 * stop the current hardware
+	 * by convention, control values are set to their minimum values
+	 */
 	public void stopHardware() { 
 		
 		this.isOnline = false; 
 		this.currentLogFileName = "";
+		this.airPressuePSI = MIN_AIR_PRESSURE_PSI;
+		this.currentAmps = MIN_CURRENT_AMPS;
 		
 	}
 	

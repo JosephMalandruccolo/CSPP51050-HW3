@@ -39,12 +39,16 @@ public class MachineControl {
 	public String getControlValues() {
 		
 		StringBuilder sb = new StringBuilder(100);
+		
+		//	hide the notion of ON/OFF from the user interface
+		/*
 		if (this.underlyingHardware.isOnline()) {
 			sb.append("Status: ON\n");
 		}
 		else {
 			sb.append("Status: OFF\n");
 		}
+		*/
 		
 		sb.append("Pressue: " + this.underlyingHardware.getAirPressure() + " PSI\n");
 		sb.append("Current: " + this.underlyingHardware.getCurrent() + " amps\n");
@@ -66,7 +70,32 @@ public class MachineControl {
 	}
 	
 	
-	
+	/**
+	 * Run the underlying hardware at for T seconds at its current control settings
+	 * @param T - the number of seconds to run the hardware
+	 * @return - a human readable result message
+	 */
+	public String runMachineForTsecondsAtCurrentSettings(int T) {
+		
+		boolean started = this.underlyingHardware.startHardware();
+		if (!started) return new String("Hardware failed to start");
+		
+		boolean success = this.underlyingHardware.work(T);
+		if (success) {
+			
+			String result = new String("Good part! See log file named '" + this.underlyingHardware.getLogFileName() + "' for details\n");
+			this.underlyingHardware.stopHardware();
+			return result;
+			
+		}
+		else {
+			
+			String result = new String("Bad part - attempted to write to log file named '" + this.underlyingHardware.getLogFileName() + "'\n");
+			this.underlyingHardware.stopHardware();
+			return result;
+			
+		}
+	}
 	
 	
 	
