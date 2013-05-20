@@ -1,6 +1,8 @@
 package phfmm;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
@@ -60,20 +62,45 @@ public class Hardware {
 	 */
 	public boolean work(HashMap<String, Integer> controlParameters) {
 		
+		if (!this.isOnline) {
+			System.out.println("Machine is not online and cannot work");
+			return false;
+		}
+		
+		//	check that the required control parameters are made
+		assert (controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE)) != null;
+		assert (controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT)) != null;
+		assert (controlParameters.get(INPUT_KEY_FOR_SECONDS)) != null;
+		
+		//	read the control parameters
 		this.airPressuePSI = controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE);
 		this.currentAmps = controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT);
 		int secondsToWork = controlParameters.get(INPUT_KEY_FOR_SECONDS);
 		
+		//		prepare to write to the log file
+		File currentLogFile = new File(this.currentLogFileName);
+		FileWriter fw = null;
+		try { fw = new FileWriter(currentLogFile.getAbsolutePath()); } 
+		catch (IOException e1) { System.out.println("Hardware failure: machine failed to find log file"); }
+		BufferedWriter bw = new BufferedWriter(fw);
+		
 		for (int i = secondsToWork; i > 0; i--) {
 			
+			//	simulate machine working
 			try { Thread.sleep(secondsToWork * SECONDS_PER_MILLISECOND); } 
 			catch (InterruptedException e) {
 				System.out.println("Hardware failure: machine failed to work for the alloted time");
 				return false;
 			} 
 			
-			//	do something every second
-			
+			//	write control values to the log file
+			try {
+				bw.write(secondsToWork+","+this.airPressuePSI+","+this.currentAmps);
+				bw.close();
+			} catch (IOException e) {
+				System.out.println("Hardware failure: machine failed to write to log");
+			}
+
 		}
 		
 		return true;
@@ -142,7 +169,12 @@ public class Hardware {
 	public boolean isOnline() { return this.isOnline; }
 	
 	
-	//	methods to start and stop the hardware
+	/**
+	 * method to "boot up" this instance of hardware
+	 * booting up the hardware generates a log file
+	 * the log file is stored in the 'dasFiles' directory in the src folder
+	 * the log file name is a concatenation of the number of milliseconds since January 1, 1970 and a pseudo-random number
+	 */
 	public void startHardware() { 
 		
 		this.isOnline = true; 
