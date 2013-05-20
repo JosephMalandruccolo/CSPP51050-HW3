@@ -159,7 +159,7 @@ public class Hardware {
 			long timeStamp = System.currentTimeMillis();
 			Random r = new Random();
 			int random = r.nextInt(999999);
-			String fileName = "/logFile" + timeStamp + random + ".csv";
+			String fileName = "src/dasFiles/logFile" + timeStamp + random + ".csv";
 			
 			File logFile = new File(fileName);
 			
@@ -186,6 +186,7 @@ public class Hardware {
 		
 		this.isOnline = false; 
 		this.currentLogFileName = "";
+		
 	}
 	
 	
