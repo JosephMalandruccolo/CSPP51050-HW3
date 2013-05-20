@@ -24,8 +24,8 @@ public class MachineControl {
 	//=====================================================================
 	//	=>	CONSTRUCTOR
 	//=====================================================================
-	public MachineControl(Hardware hardwareInstace) {
-		this.underlyingHardware = hardwareInstace;
+	public MachineControl() {
+		this.underlyingHardware = new Hardware();
 	}
 	
 	
@@ -64,6 +64,9 @@ public class MachineControl {
 		this.underlyingHardware.setCurrent(current);
 		
 	}
+	
+	
+	
 	
 	
 	

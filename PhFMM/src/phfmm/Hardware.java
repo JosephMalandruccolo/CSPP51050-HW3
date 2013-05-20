@@ -40,6 +40,7 @@ public class Hardware {
 	public static final String INPUT_KEY_FOR_AIR_PRESSURE = "air pressure";
 	public static final String INPUT_KEY_FOR_ELECTRICAL_CURRENT = "current";
 	public static final String INPUT_KEY_FOR_SECONDS = "seconds";
+	public static final int DEFAULT_SECONDS = 1;
 	
 	private static final int SECONDS_PER_MILLISECOND = 1000;
 	
@@ -115,6 +116,29 @@ public class Hardware {
 		return true;
 		
 	}
+	
+	
+	/**
+	 * Run the hardware with the current control settings for an arbitrary number of seconds
+	 * @param seconds - number of seconds to run the hardware
+	 * @return - true if the work finished successfully, false otherwise
+	 */
+	public boolean work(int seconds) {
+		HashMap<String, Integer> currentControls = new HashMap<String, Integer>();
+		currentControls.put(INPUT_KEY_FOR_AIR_PRESSURE, this.airPressuePSI);
+		currentControls.put(INPUT_KEY_FOR_ELECTRICAL_CURRENT, this.currentAmps);
+		currentControls.put(INPUT_KEY_FOR_SECONDS, seconds);
+		
+		return this.work(currentControls);
+		
+	}
+	
+	
+	/**
+	 * Run the hardware with the current control settings for DEFAULT_SECONDS
+	 * @return - true if the work finished successfully, false otherwise
+	 */
+	public boolean work() { return this.work(DEFAULT_SECONDS); }
 	
 	
 	//=====================================================================
