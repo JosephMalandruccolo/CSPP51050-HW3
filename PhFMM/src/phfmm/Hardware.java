@@ -84,7 +84,7 @@ public class Hardware {
 		catch (IOException e1) { System.out.println("Hardware failure: machine failed to find log file"); }
 		BufferedWriter bw = new BufferedWriter(fw);
 		
-		for (int i = secondsToWork; i > 0; i--) {
+		for (int i = 1; i <= secondsToWork; i++) {
 			
 			//	simulate machine working
 			try { Thread.sleep(secondsToWork * SECONDS_PER_MILLISECOND); } 
@@ -95,12 +95,21 @@ public class Hardware {
 			
 			//	write control values to the log file
 			try {
-				bw.write(secondsToWork+","+this.airPressuePSI+","+this.currentAmps);
-				bw.close();
+				
+				bw.write(i+","+this.airPressuePSI+","+this.currentAmps);
+				if (i != secondsToWork) bw.write("\n");
+				
 			} catch (IOException e) {
 				System.out.println("Hardware failure: machine failed to write to log");
 			}
 
+		}
+		
+		
+		try {
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("Hardware failure: machine failed to close log file");
 		}
 		
 		return true;
