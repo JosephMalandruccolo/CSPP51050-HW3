@@ -1,5 +1,10 @@
 package phfmm;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Random;
+
 /**
  * 
  * @author Joseph Malandruccolo
@@ -17,9 +22,10 @@ public class Hardware {
 	//=====================================================================
 	//	=>	PROPERTIES
 	//=====================================================================
-	private int airPressuePSI;	//	air pressure, measured in PSI
-	private int currentAmps;	//	current in the system, measured in amps
-	private boolean isRunning;	//	boolean indicating whether the machine is on or off
+	private int airPressuePSI;			//	air pressure, measured in PSI
+	private int currentAmps;			//	current in the system, measured in amps
+	private boolean isOnline;			//	boolean indicating whether the machine is on or off
+	private String currentLogFileName;	//	the name of the active logfile
 	
 	
 	//=====================================================================
@@ -29,6 +35,9 @@ public class Hardware {
 	public static final int MIN_AIR_PRESSURE_PSI = 0;
 	public static final int MAX_CURRENT_AMPS = 200;
 	public static final int MIN_CURRENT_AMPS = 0;
+	public static final String INPUT_KEY_FOR_AIR_PRESSURE = "air pressure";
+	public static final String INPUT_KEY_FOR_ELECTRICAL_CURRENT = "current";
+	public static final String INPUT_KEY_FOR_SECONDS = "seconds";
 	
 	private static final int SECONDS_PER_MILLISECOND = 1000;
 	
@@ -37,30 +46,37 @@ public class Hardware {
 	//	=>	CONSTRUCTOR
 	//=====================================================================
 	public Hardware() {
-		this.isRunning = false;
+		this.isOnline = false;
 		this.airPressuePSI = 0;
 		this.currentAmps = 0;
+		this.currentLogFileName = "";
 	}
 	
-	//=====================================================================
-	//	=>	PUBLIC API
-	//=====================================================================
-	public void work(int airPressure, int current, int seconds) {
+	
+	/**
+	 * Method that accepts 1 to N control parameters
+	 * @param controlParameters - n parameters used to control the machine
+	 * @return true if the work finished successfully, false otherwise
+	 */
+	public boolean work(HashMap<String, Integer> controlParameters) {
 		
-		if (!this.isRunning) {
-			throw new IllegalStateException("This machine is not running: cannot perform work");
+		this.airPressuePSI = controlParameters.get(INPUT_KEY_FOR_AIR_PRESSURE);
+		this.currentAmps = controlParameters.get(INPUT_KEY_FOR_ELECTRICAL_CURRENT);
+		int secondsToWork = controlParameters.get(INPUT_KEY_FOR_SECONDS);
+		
+		for (int i = secondsToWork; i > 0; i--) {
+			
+			try { Thread.sleep(secondsToWork * SECONDS_PER_MILLISECOND); } 
+			catch (InterruptedException e) {
+				System.out.println("Hardware failure: machine failed to work for the alloted time");
+				return false;
+			} 
+			
+			//	do something every second
+			
 		}
 		
-		this.setAirPressure(airPressure);
-		this.setCurrent(current);
-		
-		try {
-			Thread.sleep(seconds * SECONDS_PER_MILLISECOND);
-		} catch (InterruptedException e) {
-			System.out.println("System failure: failed to run for indicated time");
-			e.printStackTrace();
-			throw new IllegalStateException("Machine failed to run for the indicated time");
-		}
+		return true;
 		
 	}
 	
@@ -123,11 +139,55 @@ public class Hardware {
 	 * test if the current hardware instance is running
 	 * @return - true if the hardware is running, false otherwise
 	 */
-	public boolean isRunning() { return this.isRunning; }
+	public boolean isOnline() { return this.isOnline; }
 	
 	
 	//	methods to start and stop the hardware
-	public void startHardware() { this.isRunning = true; }
-	public void stopHardware() { this.isRunning = false; }
+	public void startHardware() { 
+		
+		this.isOnline = true; 
+		
+		//	generate a log file
+		int createFileAttempts = 0;
+		boolean logFileSuccessfullyCreated = false;
+		
+		do {
+			
+			createFileAttempts++;
+			
+			//	build a candidate file name
+			long timeStamp = System.currentTimeMillis();
+			Random r = new Random();
+			int random = r.nextInt(999999);
+			String fileName = "/logFile" + timeStamp + random + ".csv";
+			
+			File logFile = new File(fileName);
+			
+			if (logFile.exists()) {
+				//	file naming conflict, need to create another file
+			}
+			else {
+				//	create the file
+				try {
+					logFile.createNewFile();
+					logFileSuccessfullyCreated = true;
+					this.currentLogFileName = fileName;
+				} catch (IOException e) {
+					System.out.println("Failed to write log file");
+				}
+			}
+			
+		} while (createFileAttempts <= 3 && logFileSuccessfullyCreated == false);
+		
+	}
 	
+	
+	public void stopHardware() { 
+		
+		this.isOnline = false; 
+		this.currentLogFileName = "";
+	}
+	
+	
+	public String getLogFileName() { return this.currentLogFileName; }
 }
