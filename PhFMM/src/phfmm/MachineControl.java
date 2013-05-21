@@ -273,8 +273,7 @@ public class MachineControl {
 		 
 	 }
 	 
-	 @SuppressWarnings("resource")
-	private boolean validateLogFileWithReferenceFile(String logfile, String recipeName) {
+	 private boolean validateLogFileWithReferenceFile(String logfile, String recipeName) {
 		 
 		 //	get records from reference file
 		 String fullPath = kREFERENCE_FILE_PATH + recipeName + kREFERENCE_FILE_SUFFIX;
