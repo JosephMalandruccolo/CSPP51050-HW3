@@ -39,6 +39,10 @@ public class UserInterface {
 	//=====================================================================
 	//	=>	PUBLIC API
 	//=====================================================================
+	/**
+	 * Get the machine's current control values
+	 * @return
+	 */
 	public String getControlValues() {
 		
 		StringBuffer sb = new StringBuffer();
@@ -50,6 +54,12 @@ public class UserInterface {
 	}
 	
 	
+	/**
+	 * Set the machine's current control values
+	 * @param airPressure
+	 * @param current
+	 * @return a human readable representation of the current state of control values
+	 */
 	public String setControlValues(int airPressure, int current) {
 		
 		this.mcLayer.setControlValues(airPressure, current);
@@ -58,6 +68,11 @@ public class UserInterface {
 	}
 	
 	
+	/**
+	 * Run the machine for an arbitrary number of seconds at the current settings
+	 * @param secondsToRunAtCurrentSettings
+	 * @return - the result of the run
+	 */
 	public String manualRun(int secondsToRunAtCurrentSettings) {
 		
 		StringBuffer sb = new StringBuffer();
@@ -71,6 +86,12 @@ public class UserInterface {
 	}
 	
 	
+	/**
+	 * Execute a recipe on the machine at a given file path
+	 * The file should be located in in the recipeFiles directory
+	 * @param recipeFilePath - path to the recipe
+	 * @return - the result of the run
+	 */
 	public String executeRecipe(String recipeFilePath) {
 		
 		StringBuffer sb = new StringBuffer();

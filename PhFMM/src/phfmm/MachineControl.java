@@ -159,7 +159,7 @@ public class MachineControl {
 			boolean success = validateLogFileWithReferenceFile(logfile, referenceFileName);
 			
 			//	print a message depending on the results of validation
-			if (success) return new String("good part");
+			if (success) return new String("good part See log file named '" + logfile + "' for details\n");
 			else return new String ("bad part");
 			
 		}
