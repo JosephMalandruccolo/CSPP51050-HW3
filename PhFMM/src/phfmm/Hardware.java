@@ -275,24 +275,20 @@ public class Hardware {
 	 * stop the current hardware
 	 * by convention, control values are set to their minimum values
 	 */
-	public void stopHardware() { 
+	public String stopHardware() { 
+		
+		String logFileName = this.currentLogFileName;
 		
 		this.isOnline = false; 
 		this.currentLogFileName = "";
 		this.airPressuePSI = MIN_AIR_PRESSURE_PSI;
 		this.currentAmps = MIN_CURRENT_AMPS;
 		
+		return logFileName;
+		
 	}
 	
 	
 	public String getLogFileName() { return this.currentLogFileName; }
-	
-	
-	
-	
 
-	
-	
-	
-	
 }
